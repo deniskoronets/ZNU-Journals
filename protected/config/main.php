@@ -3,6 +3,8 @@
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 
+Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
+
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
 return array(
@@ -18,20 +20,40 @@ return array(
 		'application.components.*',
 	),
 
+    'theme'=>'bootstrap',
+
 	'modules'=>array(
-		// uncomment the following to enable the Gii tool
-		/*
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
-			'password'=>'Enter Your Password Here',
-			// If removed, Gii defaults to localhost only. Edit carefully to taste.
+			'password'=>'parol',
+
 			'ipFilters'=>array('127.0.0.1','::1'),
+
+            'generatorPaths'=>array(
+                'bootstrap.gii',
+            ),
 		),
-		*/
+
 	),
 
 	// application components
 	'components'=>array(
+        'viewRenderer'=>array(
+            //'class'=>'ext.yiiext.renderers.twig.ETwigViewRenderer',
+            'class' => 'application.extensions.twig.ETwigViewRenderer',
+            'fileExtension' => '.html',
+            'options' => array(
+                'autoescape' => true,
+            ),
+            'extentions' => array(
+                'My_Twig_Extension',
+            ),
+        ),
+
+        'bootstrap' => array(
+            'class' => 'bootstrap.components.Bootstrap',
+        ),
+
 		'user'=>array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
@@ -47,38 +69,47 @@ return array(
 			),
 		),
 		*/
-		'db'=>array(
-			'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
-		),
 		// uncomment the following to use a MySQL database
-		/*
+
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=testdrive',
+			'connectionString' => 'mysql:host=localhost;dbname=journals_system',
 			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
+			'username' => 'some',
+			'password' => 'some',
 			'charset' => 'utf8',
-		),
-		*/
+
+            'enableProfiling' => true,
+            'enableParamLogging' => true
+        ),
+
+
+
+        /* 'log' => array(
+          'class' => 'CLogRouter',
+          'routes' => array(
+             'db' => array(
+             'class' => 'CWebLogRoute',
+             'categories' => 'system.db.CDbCommand',
+             'showInFireBug' => true, //Показывать в FireBug или внизу каждой страницы
+           ),
+           ),
+		), */
+
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
 			'errorAction'=>'site/error',
 		),
-		'log'=>array(
-			'class'=>'CLogRouter',
-			'routes'=>array(
-				array(
-					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning',
-				),
-				// uncomment the following to show log messages on web pages
-				/*
-				array(
-					'class'=>'CWebLogRoute',
-				),
-				*/
-			),
-		),
+
+        /* 'log'=>array(
+            'class'=>'CLogRouter',
+            'routes'=>array(
+                array(
+                    'class'=>'CWebLogRoute',
+                    'categories' => 'system.db.CDbCommand',
+
+                ),
+            ),
+        ), */
 	),
 
 	// application-level parameters that can be accessed
