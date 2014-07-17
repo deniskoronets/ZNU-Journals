@@ -1,0 +1,101 @@
+{# просмотр журнала #}
+
+{% extends "default/main.html"  %}
+
+{% block content %}
+
+    <h1>{{ journal.name }}</h1>
+
+    <style>
+        .issues {
+            clear: both;
+        }
+
+        .issue {
+            border: 1px solid #eee;
+            width: 50%;
+            margin: 0 -1px;
+            float: left;
+        }
+
+        .issue .cont {
+            padding: 10px;
+        }
+
+        .issue h3 {
+            margin: 0;
+        }
+
+        .speedlinks {
+            padding: 10px;
+            border: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+    <form action='' method='POST' role='form' class='form'>
+        <h3>Поиск</h3>
+        <div class='form-group'>
+            <label>Год</label>
+            <select name='year' class='form-control'>
+                <option value=''>Выберите...</option>
+                {% for year in years %}
+                <option {% if searchedYear == year %}SELECTED{% endif %} value='{{ year }}'>{{ year }} год.</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class='form-group'>
+            <label>Текст поиска</label>
+            <input type='text' name='search' class='form-control' value='{{ searchedText }}'>
+        </div>
+        <div class='form-group'>
+            <input type='submit' name='searchButton' value='Найти' class='btn btn-success'>
+            <a class='btn btn-success' href='{{ this.createUrl('', {'journalId': journal.journal_id}) }}'>Сброс</a>
+        </div>
+    </form>
+
+    <div class='speedlinks'>
+        <b>Статические страницы:</b>
+        <ul>
+        {% for page in journal.static_pages %}
+            {% if page.is_visible %}
+                <li><a href='{{ this.createUrl('pages/view', {'id': page.static_page_id}) }}'>
+                    {{ page.name }}
+                </a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+
+        <b>Дополнительные страницы:</b>
+        <ul>
+        {% for specialPage in specialPages %}
+            <li><a href='{{ specialPage.url }}'>
+                {{ specialPage.name }}
+            </a></li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <div class='issues'>
+
+        {% for issue in issues %}
+        <div class='issue'>
+            <div class='cont'>
+                <h3><a href='{{ this.createUrl('issues/view', {'id': issue.issue_id}) }}'>{{ issue.name }}</a></h3>
+                {{ C.Html.image("/resources/thumbs/journals_covers/" ~ issue.image ~ '_120x180px.png', true) | raw }}
+            </div>
+        </div>
+        {% else %}
+            Выпуски не найдены!
+        {% endfor %}
+
+        <div style='clear: both;'></div>
+    </div>
+
+    <div style='margin-top: 20px;'></div>
+    {{ this.widget('CLinkPager', {
+        'pages': issuesNumPages
+    }, true) | raw }}
+
+{% endblock %}

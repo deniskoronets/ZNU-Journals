@@ -1,9 +1,6 @@
 <?php
 
 /**
- * This is the model class for table "issues".
- *
- * The followings are the available columns in table 'issues':
  * @property integer $issue_id
  * @property integer $journal_id
  * @property string $name
@@ -17,11 +14,7 @@
  */
 class Issues extends CActiveRecord
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return Issues the static model class
-	 */
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -63,6 +56,8 @@ class Issues extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+            'journal' => array(self::BELONGS_TO, 'Journals', 'journal_id'),
+            'articles' => array(self::HAS_MANY, 'Articles', 'issue_id'),
 		);
 	}
 

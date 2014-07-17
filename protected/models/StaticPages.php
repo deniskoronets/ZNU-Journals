@@ -1,9 +1,6 @@
 <?php
 
 /**
- * This is the model class for table "static_pages".
- *
- * The followings are the available columns in table 'static_pages':
  * @property integer $static_page_id
  * @property integer $journal_id
  * @property string $name
@@ -56,6 +53,7 @@ class StaticPages extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+            'journal' => array(self::BELONGS_TO, 'Journals', 'journal_id'),
 		);
 	}
 
@@ -72,6 +70,24 @@ class StaticPages extends CActiveRecord
 			'is_visible' => 'Is Visible',
 		);
 	}
+
+    /**
+      * Returns html content of page
+      * @return String
+      */
+    public function getContent()
+    {
+        $pagePath = Yii::app()->params['webRoot'] . Yii::app()->params['staticPagesPath']
+                  .  'journal_' . $this->journal->journal_id . '/' . $this->html_file_path . '.html';
+
+        if (file_exists($pagePath)) {
+            return file_get_contents($pagePath);
+        } else {
+            return 'Файл с содержанием страницы журнала не существует';
+        }
+
+        return null;
+    }
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.

@@ -77,11 +77,21 @@ class ETwigViewRenderer extends CApplicationComponent implements IViewRenderer
 
         $this->_paths = array();
 
+        /*
+
+        не используем пути по умолчанию
+
         if ($theme !== null) {
             $this->_paths[] = $theme->getBasePath();
         }
 
         $this->_paths[] = $app->getBasePath();
+
+        */
+
+        if (isset($this->options['path'])) {
+             $this->_paths[] = $this->options['path'];
+        }
 
         $loader = new Twig_Loader_Filesystem($this->_paths);
 

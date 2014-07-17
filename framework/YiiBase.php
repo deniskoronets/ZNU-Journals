@@ -192,7 +192,7 @@ class YiiBase
 		else
 			throw new CException(Yii::t('yii','Object configuration must be an array containing a "class" element.'));
 
-		if(!class_exists($type,false))
+        if(!class_exists($type,false))
 			$type=Yii::import($type,true);
 
 		if(($n=func_num_args())>1)
@@ -270,16 +270,17 @@ class YiiBase
 
 		if(($pos=strrpos($alias,'\\'))!==false) // a class name in PHP 5.3 namespace format
 		{
-			$namespace=str_replace('\\','.',ltrim(substr($alias,0,$pos),'\\'));
+            $namespace=str_replace('\\','.',ltrim(substr($alias,0,$pos),'\\'));
 			if(($path=self::getPathOfAlias($namespace))!==false)
 			{
 				$classFile=$path.DIRECTORY_SEPARATOR.substr($alias,$pos+1).'.php';
+
 				if($forceInclude)
 				{
-					if(is_file($classFile))
+                    if(is_file($classFile))
 						require($classFile);
 					else
-						throw new CException(Yii::t('yii','Alias "{alias}" is invalid. Make sure it points to an existing PHP file and the file is readable.',array('{alias}'=>$alias)));
+						throw new CException(Yii::t('yii','Alias "{alias}" is invalid. Make sure it points to an existing PHP file and the file is readable. ({classfile})',array('{alias}'=>$alias, '{classfile}' => $classFile)));
 					self::$_imports[$alias]=$alias;
 				}
 				else
@@ -306,11 +307,11 @@ class YiiBase
 
 		if(($path=self::getPathOfAlias($alias))!==false)
 		{
-			if($isClass)
+            if($isClass)
 			{
-				if($forceInclude)
+                if($forceInclude)
 				{
-					if(is_file($path.'.php'))
+                    if(is_file($path.'.php'))
 						require($path.'.php');
 					else
 						throw new CException(Yii::t('yii','Alias "{alias}" is invalid. Make sure it points to an existing PHP file and the file is readable.',array('{alias}'=>$alias)));

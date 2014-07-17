@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="language" content="en" />
+
+	<title>{{ C.Html.encode(this.pageTitle) }}</title>
+
+	{{ App.bootstrap.register() }}
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href=" /assets/e3ecaab1/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href=" /assets/e3ecaab1/css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href=" /assets/e3ecaab1/css/yii.css" />
+    <script type="text/javascript" src=" /assets/f768c3e2/jquery.js"></script>
+    <script type="text/javascript" src=" /assets/e3ecaab1/js/bootstrap.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{ App.theme.baseUrl }}/css/styles.css" />
+
+</head>
+
+<body>
+
+    {{
+        this.widget('bootstrap.widgets.TbNavbar', {
+            'items': {
+                0: {
+                    'class': 'bootstrap.widgets.TbMenu',
+                    'items': [
+                        {'label': 'Список журналов', 'url': ['journals/index']},
+                        {'label': 'Регистрация', 'url': ['site/registration'], 'visible': App.user.isGuest},
+                        {'label': 'Авторизация', 'url': ['/site/login'], 'visible': App.user.isGuest},
+                        {'label': 'Выход (' ~ App.user.name ~ ')', 'url': ['/site/logout'], 'visible': not App.user.isGuest}
+                    ]
+                }
+            }
+        }, true) | raw
+    }}
+
+<div class="container" id="page">
+
+    {{ this.widget('bootstrap.widgets.TbBreadcrumbs', {
+        'links': this.breadcrumbs,
+    }, true) | raw }}
+
+	{% block content %}
+        Default content
+    {% endblock %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+{# просмотр журнала #}
+
+{% extends "default/main.html"  %}
+
+{% block content %}
+
+    <h1>Регистрация в журнале "{{ journal.name }}"</h1>
+
+    <style>
+        .issues {
+            clear: both;
+        }
+
+        .issue {
+            border: 1px solid #eee;
+            width: 50%;
+            margin: 0 -1px;
+            float: left;
+        }
+
+        .issue .cont {
+            padding: 10px;
+        }
+
+        .issue h3 {
+            margin: 0;
+        }
+
+        .speedlinks {
+            padding: 10px;
+            border: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+
+    </style>
+
+    <div class='issues'>
+
+        <form action='' method='post'>
+            azazaaza, тут будет форма регистрации в журнале
+        </form>
+
+        <div style='clear: both;'></div>
+    </div>
+
+{% endblock %}

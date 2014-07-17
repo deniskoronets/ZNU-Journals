@@ -60,6 +60,8 @@ class Articles extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+            'issue' => array(self::BELONGS_TO, 'Issues', 'issue_id'),
+            'journal' => array(self::BELONGS_TO, 'Journals', 'article_id'),
 		);
 	}
 
@@ -80,6 +82,16 @@ class Articles extends CActiveRecord
 			'authors' => 'Authors',
 		);
 	}
+
+    /**
+      * Получить путь к файлу статьи для html
+      * @return string
+      */
+    public function getFilePathForHtml()
+    {
+        return Yii::app()->params['articlesPath'] . 'journal_' . $this->journal->journal_id . '/'
+             . 'issue_' . $this->issue->issue_id . '/' . $this->file_path;
+    }
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.

@@ -2,33 +2,54 @@
 
 class SiteController extends Controller
 {
-	public $layout='main';
+    public $layout='//layouts/column1';
 
-    /**
-	 * Declares class-based actions.
-	 */
-	public function actions()
-	{
-		return array(
-			// captcha action renders the CAPTCHA image displayed on the contact page
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
-			),
-			// page action renders "static" pages stored under 'protected/views/site/pages'
-			// They can be accessed via: index.php?r=site/page&view=FileName
-			'page'=>array(
-				'class'=>'CViewAction',
-			),
-		);
+    public function actionIndex()
+    {
+        $this->render('index');
+    }
+
+    /**** регистрация ***/
+    public function actionRegistration()
+    {
+        $this->render('registration');
+    }
+
+    /**** авторизация ***/
+    public function actionLogin()
+    {
+        $model = new LoginForm;
+
+		// collect user input data
+		if (isset($_POST['LoginForm'])) {
+			$model->attributes=$_POST['LoginForm'];
+
+			if($model->validate() && $model->login()) {
+				$this->redirect(Yii::app()->user->returnUrl);
+            }
+		}
+
+		$this->render('login', array('model' => $model));
 	}
 
 	/**
-	 * This is the default 'index' action that is invoked
-	 * when an action is not explicitly requested by users.
+	 * Logs out the current user and redirect to homepage.
 	 */
-	public function actionIndex()
+	public function actionLogout()
 	{
-        $this->redirect(array('journals/index'));
-	}
+		Yii::app()->user->logout();
+
+		$this->redirect(Yii::app()->homeUrl);
+    }
+
+    public function actionError()
+    {
+        if ($error = Yii::app()->errorHandler->error) {
+            if (Yii::app()->request->isAjaxRequest) {
+                echo $error['message'];
+            } else {
+                $this->render('error', $error);
+            }
+        }
+    }
 }

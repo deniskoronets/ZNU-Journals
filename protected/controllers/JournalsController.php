@@ -2,91 +2,149 @@
 
 class JournalsController extends Controller
 {
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
-	public $layout='//layouts/column2';
+	public $layout='//layouts/column1';
 
-	/**
-	 * @return array action filters
-	 */
 	public function filters()
 	{
 		return array(
-			'accessControl', // perform access control for CRUD operations
-			'postOnly + delete', // we only allow deletion via POST request
+			'accessControl',
 		);
 	}
 
-	/**
-	 * Specifies the access control rules.
-	 * This method is used by the 'accessControl' filter.
-	 * @return array access control rules
-	 */
+    /**
+     * Права доступа к страницам
+     */
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
+			array('allow',
+				'actions' => array('index', 'view', 'registration'),
+				'users' => array('*'),
 			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
-				'users'=>array('@'),
-			),
-			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
-				'users'=>array('admin'),
-			),
-			array('deny',  // deny all users
-				'users'=>array('*'),
+			array('deny',
+				'users' => array('*'),
 			),
 		);
 	}
 
+    /**
+     * Просмотр конкретного журнала
+     * Генерация с помощью TWIG
+     * @param int $journalId - ID журнала
+     */
 	public function actionView($journalId)
 	{
 		$journal = $this->loadModel($journalId);
 
-        $this->renderFile('journalsThemes/default/journals/view.html', array(
-            'journal' => $journal,
-            'document' => array('title' => 'some'),
-            'themePath' => 'journalsThemes/default/',
+        $this->breadcrumbs = array(
+            'Журналы' => array('index'),
+            $journal->name,
+        );
+
+        // дополнительный страницы журнала
+        $specialPages = array(
+            /* array(
+                'name' => 'Регистрация в журнале',
+                'url'  => $this->createUrl('journals/registration', array('journalId' => $journalId)),
+            ), */
+            array(
+                'name' => 'Отправить статью',
+                'url'  => $this->createUrl('articles/send', array('id' => $journalId)),
+            ),
+        );
+
+        // года
+        $years = array();
+        for ($i = 2010; $i <= 2014 && $years[] = $i; $i++);
+
+        // постраничный вывод
+        $criteria = new CDbCriteria();
+        $criteria->condition = 'journal_id = :journalId';
+        $criteria->params = array('journalId' => $journalId);
+
+        // поиск
+        $searchedText = '';
+        $searchedYear = '';
+
+        if (!empty($_POST)) {
+            $searchedText = $_POST['search'];
+            $searchedYear = (int)$_POST['year'];
+
+            $criteria->condition .= ' AND name LIKE :name AND year = :year';
+            $criteria->params['name'] = '%' . $_POST['search'] . '%';
+            $criteria->params['year'] = (int)$_POST['year'];
+        }
+
+        $count = Issues::model()->count($criteria);
+        $pages = new CPagination($count);
+        $pages->pageSize = 15; // кол-во журналов на странице
+        $pages->applyLimit($criteria);
+        $issues = Issues::model()->findAll($criteria);
+
+        $this->renderJournalTemplate($journal->theme, 'journals/view', array(
+            'journal'      => $journal,
+            'specialPages' => $specialPages,
+
+            // постраничный вывод выпусков
+            'issues'         => $issues,
+            'issuesNumPages' => $pages,
+
+            // для поиска
+            'searchedText'   => $searchedText,
+            'searchedYear'   => $searchedYear,
+            'years'          => $years,
         ));
 	}
 
+    /**
+     * Список всех журналов
+     */
 	public function actionIndex()
 	{
 		$journals = Journals::model()->findAll();
 
-        $this->renderFile('journalsThemes/default/journals/index.html', array(
-            'journals' => $journals,
-            'document' => array('title' => 'some'),
-            'themePath' => 'journalsThemes/default/',
-        ));
+        $this->breadcrumbs = array(
+            'Журналы',
+        );
 
-        /*
-        $this->render('index',array(
+        $this->render('index', array(
 			'journals' => $journals,
 		));
-        */
 	}
 
-	public function loadModel($id)
+    /**
+      * Регистрация в журнале
+      * Генерация с помощью TWIG
+      * @param int $journalId - ID журнала
+      */
+    public function actionRegistration($journalId)
+    {
+        $journal = $this->loadModel($journalId);
+
+        $this->breadcrumbs = array(
+            'Журналы' => array('index'),
+            $journal->name,
+        );
+
+        // действия с регистрацией
+
+        $this->renderJournalTemplate($journal->theme, 'journals/registration', array(
+            'journal' => $journal,
+        ));
+    }
+
+    /**
+     * Функция для подгрузки журнала (экземпляра модели)
+     * @param int $id - ID журнала
+     */
+	public function loadModel($journalId)
 	{
-		$model=Journals::model()->findByPk($id);
-		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
+		$model = Journals::model()->findByPk($journalId);
+
+		if ($model === null) {
+			throw new CHttpException(404, 'The requested page does not exist.');
+        }
+
 		return $model;
-	}
-
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='journals-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
 	}
 }

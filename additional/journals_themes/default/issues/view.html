@@ -1,0 +1,43 @@
+{# просмотр выпуска журнала #}
+
+{% extends "default/main.html"  %}
+
+{% block content %}
+
+    <h1>{{ issue.journal.name }} <small>{{ issue.name }}</small></h1>
+
+    <hr>
+
+    {{ C.Html.image("/resources/thumbs/journals_covers/" ~ issue.image ~ '_480x640px.png', true) | raw }}
+
+    <hr>
+
+    <style>
+        .articles {
+            margin: 0;
+        }
+
+        .articles li {
+            border: 1px solid gray;
+            list-style: none;
+            margin: 5px;
+            padding: 10px;
+        }
+    </style>
+
+    {% for rubric in rubrics %}
+        <b>{{ rubric.info.name }}</b>
+        <ul class='articles'>
+            {% for article in rubric.articles %}
+            <li>
+                <p><a href='{{ this.createUrl('articles/view', {id: article.article_id}) }}'>
+                    <b>{{ article.name }}</b>
+                </a></p>
+                <p>{{ article.annotation }}</p>
+                <p><i>Авторы: {{ article.authors }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+{% endblock %}
